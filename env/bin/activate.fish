@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/home/kevin/Documents/Bureau/Projet-python/FastApi_JWT/env"
+set -gx VIRTUAL_ENV "/home/kevin/Documents/Bureau/Projet-python/TEST_JWT_WITH_FastAPI/env"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH
