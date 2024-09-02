@@ -91,7 +91,7 @@ async def login_for_access_token(form_data: Login, db: AsyncSession = Depends(ge
     if not user or not verify_password(form_data.password, user['hashed_password']):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail="Incorrect email ou mots de pass",
             headers={"WWW-Authenticate": "Bearer"},
         )
     # Déterminez la durée de vie du token en fonction de "rememberMe"
