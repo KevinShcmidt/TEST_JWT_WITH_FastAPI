@@ -97,7 +97,7 @@ async def login_for_access_token(form_data: Login, db: AsyncSession = Depends(ge
     # Déterminez la durée de vie du token en fonction de "rememberMe"
     expires_delta = timedelta(days=30) if form_data.rememberMe else timedelta(minutes=15)
     access_token = create_access_token(data={"sub": user['email']}, expires_delta=expires_delta)
-    return {"access_token": access_token, "token_type": "bearer", "role" : user['role']}
+    return {"access_token": access_token, "token_type": "bearer", "user" : user}
 
 # Define oauth2_scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
