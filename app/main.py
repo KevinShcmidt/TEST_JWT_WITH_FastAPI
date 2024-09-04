@@ -103,22 +103,22 @@ async def login_for_access_token(form_data: Login, db: AsyncSession = Depends(ge
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Protected Route
-@app.get("/users/me", response_model=User)
-async def read_users_me(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-    query = users.select().where(users.c.email == email)
-    user = await db.fetch_one(query)
-    if user is None:
-        raise credentials_exception
-    return User(id=user['id'], email=user['email'])
+# @app.get("/users/me", response_model=User)
+# async def read_users_me(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
+#     credentials_exception = HTTPException(
+#         status_code=status.HTTP_401_UNAUTHORIZED,
+#         detail="Could not validate credentials",
+#         headers={"WWW-Authenticate": "Bearer"},
+#     )
+#     try:
+#         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+#         email: str = payload.get("sub")
+#         if email is None:
+#             raise credentials_exception
+#     except JWTError:
+#         raise credentials_exception
+#     query = users.select().where(users.c.email == email)
+#     user = await db.fetch_one(query)
+#     if user is None:
+#         raise credentials_exception
+#     return User(id=user['id'], email=user['email'])
