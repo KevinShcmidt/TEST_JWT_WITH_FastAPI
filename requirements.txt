@@ -7,4 +7,6 @@ python-jose
 uvicorn
 asyncpg
 psycopg2-binary
+websockets
+ocpp
 fastapi[all]
