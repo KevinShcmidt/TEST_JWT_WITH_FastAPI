@@ -79,12 +79,12 @@ class MyChargePoint(cp):
     @on(Action.StartTransaction)
     async def on_start_transaction(self, connector_id, id_tag, meter_start, timestamp, **kwargs):
         transaction_id = 1
-        print(f"Start transaction: connector_id={connector_id}, id_tag={id_tag}, meter_start={meter_start}, timestamp={timestamp}")
-        # Notification à tous les clients
-        # await notify_clients({
-        #     "type": "StartTransaction",
-        #     "message": f"Transaction started: connector_id={connector_id}, id_tag={id_tag}, meter_start={meter_start}, timestamp={timestamp}"
-        # })
+        # print(f"Start transaction: connector_id={connector_id}, id_tag={id_tag}, meter_start={meter_start}, timestamp={timestamp}")
+        await notify_clients({
+            'type': 'StartTransaction',
+            'message': { 'connector_id': connector_id, 'id_tag': id_tag, 'meter_start': meter_start }, 
+            'timestamp': timestamp
+        })
         return call_result.StartTransaction(
             id_tag_info={
                 'status': 'Accepted'
@@ -96,10 +96,11 @@ class MyChargePoint(cp):
     async def on_stop_transaction(self, transaction_id, meter_stop, timestamp, **kwargs):
         print(f"Stop transaction: transaction_id={transaction_id}, meter_stop={meter_stop}, timestamp={timestamp}")
         # Notification à tous les clients
-        # await notify_clients({
-        #     "type": "StopTransaction",
-        #     "message": f"Transaction stopped: transaction_id={transaction_id}, meter_stop={meter_stop}, timestamp={timestamp}"
-        # })
+        await notify_clients({
+            "type": "StopTransaction",
+            "message": {'transaction_id':transaction_id, 'meter_stop' : meter_stop},
+            'timestamp' : timestamp,
+        })
         return call_result.StopTransaction(
             id_tag_info={
                 'status': 'Accepted'
