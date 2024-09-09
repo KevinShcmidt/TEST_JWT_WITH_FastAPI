@@ -29,7 +29,7 @@ class MyChargePoint(cp):
         print("Received BootNotification")
         call.ChangeConfiguration(
             key="MeterValueSampleInterval",
-            value=str(1)
+            value=5
         )
         return call_result.BootNotification(
             current_time=datetime.now().isoformat(),
@@ -40,6 +40,10 @@ class MyChargePoint(cp):
     @on(Action.Heartbeat)
     async def on_heartbeat(self, **kwargs):
         print("Received Heartbeat")
+        # await notify_clients({
+        # 'type': 'Heartbeat',
+        # 'message': "Received heartbeat from charge point"
+        # })
         return call_result.Heartbeat(
             current_time=datetime.now().isoformat()
         )
@@ -64,37 +68,43 @@ class MyChargePoint(cp):
     @on(Action.StatusNotification)
     async def on_status_notification(self, connector_id, status, error_code, **kwargs):
         print("Received StatusNotification")
+        await notify_clients({
+        'type': 'StatusNotification',
+        'connector_id': connector_id,
+        'status': status,
+        'error_code': error_code
+        })
         return call_result.StatusNotification()
 
-@on(Action.StartTransaction)
-async def on_start_transaction(self, connector_id, id_tag, meter_start, timestamp, **kwargs):
-    transaction_id = 1
-    print(f"Start transaction: connector_id={connector_id}, id_tag={id_tag}, meter_start={meter_start}, timestamp={timestamp}")
-    # Notification à tous les clients
-    await notify_clients({
-        "type": "StartTransaction",
-        "message": f"Transaction started: connector_id={connector_id}, id_tag={id_tag}, meter_start={meter_start}, timestamp={timestamp}"
-    })
-    return call_result.StartTransaction(
-        id_tag_info={
-            'status': 'Accepted'
-        },
-        transaction_id=transaction_id
-    )
+    @on(Action.StartTransaction)
+    async def on_start_transaction(self, connector_id, id_tag, meter_start, timestamp, **kwargs):
+        transaction_id = 1
+        print(f"Start transaction: connector_id={connector_id}, id_tag={id_tag}, meter_start={meter_start}, timestamp={timestamp}")
+        # Notification à tous les clients
+        # await notify_clients({
+        #     "type": "StartTransaction",
+        #     "message": f"Transaction started: connector_id={connector_id}, id_tag={id_tag}, meter_start={meter_start}, timestamp={timestamp}"
+        # })
+        return call_result.StartTransaction(
+            id_tag_info={
+                'status': 'Accepted'
+            },
+            transaction_id=transaction_id
+        )
 
-@on(Action.StopTransaction)
-async def on_stop_transaction(self, transaction_id, meter_stop, timestamp, **kwargs):
-    print(f"Stop transaction: transaction_id={transaction_id}, meter_stop={meter_stop}, timestamp={timestamp}")
-    # Notification à tous les clients
-    await notify_clients({
-        "type": "StopTransaction",
-        "message": f"Transaction stopped: transaction_id={transaction_id}, meter_stop={meter_stop}, timestamp={timestamp}"
-    })
-    return call_result.StopTransaction(
-        id_tag_info={
-            'status': 'Accepted'
-        }
-    )
+    @on(Action.StopTransaction)
+    async def on_stop_transaction(self, transaction_id, meter_stop, timestamp, **kwargs):
+        print(f"Stop transaction: transaction_id={transaction_id}, meter_stop={meter_stop}, timestamp={timestamp}")
+        # Notification à tous les clients
+        # await notify_clients({
+        #     "type": "StopTransaction",
+        #     "message": f"Transaction stopped: transaction_id={transaction_id}, meter_stop={meter_stop}, timestamp={timestamp}"
+        # })
+        return call_result.StopTransaction(
+            id_tag_info={
+                'status': 'Accepted'
+            }
+        )
 
 async def websocket_handler(websocket, path):
     charge_point_id = path.strip('/')
@@ -108,7 +118,7 @@ async def websocket_handler(websocket, path):
         while True:
             message = await websocket.receive_text()
             print(f"Received message: {message}")
-            await broadcast_message({"content": message})
+            await notify_clients({"content": message})
     except ConnectionClosedOK:
         print("Client disconnected")
     except Exception as e:
