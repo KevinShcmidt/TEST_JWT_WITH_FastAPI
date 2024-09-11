@@ -24,12 +24,13 @@ async def notify_clients(message):
         await asyncio.gather(*tasks)
 
 class MyChargePoint(cp):
+    
     @on(Action.BootNotification)
     async def on_boot_notification(self, charge_point_vendor, charge_point_model, **kwargs):
         print("Received BootNotification")
         call.ChangeConfiguration(
             key="MeterValueSampleInterval",
-            value=5
+            value=1
         )
         return call_result.BootNotification(
             current_time=datetime.now().isoformat(),
@@ -40,10 +41,10 @@ class MyChargePoint(cp):
     @on(Action.Heartbeat)
     async def on_heartbeat(self, **kwargs):
         print("Received Heartbeat")
-        # await notify_clients({
-        # 'type': 'Heartbeat',
-        # 'message': "Received heartbeat from charge point"
-        # })
+        await notify_clients({
+        'type': 'Heartbeat',
+        'message': "Received heartbeat from charge point"
+        })
         return call_result.Heartbeat(
             current_time=datetime.now().isoformat()
         )
